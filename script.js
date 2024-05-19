@@ -1,8 +1,13 @@
 document.getElementById('swapViewButton').addEventListener('click', function() {
-    const chart = document.querySelector('.chart');
-    if (chart.textContent === 'CHART PLACEHOLDER') {
-        chart.textContent = 'OTHER VIEW PLACEHOLDER';
+    const tableView = document.getElementById('tableView');
+    const otherView = document.getElementById('otherView');
+
+    if (tableView.style.display === 'none') {
+        tableView.style.display = 'block';
+        otherView.style.display = 'none';
     } else {
-        chart.textContent = 'CHART PLACEHOLDER';
+        tableView.style.display = 'none';
+        otherView.style.display = 'block';
     }
 });
+
