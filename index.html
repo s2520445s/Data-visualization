@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Netflix Movie and Shows Data Visualization</title>
+  <title>Netflix Data Visualization</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -13,6 +13,7 @@
     <a href="index.html">Home</a>
     <a href="login.html">Login</a>
     <a href="register.html">Register</a>
+    <a href="profile.html">Profile</a>
     <a href="about.html">About</a>
   </nav>
   <h1 class="curved-title">Data Visualization Dashboard</h1>
@@ -22,54 +23,8 @@
   <section id="visualization">
     <h2>Visualization Title <button id="swapViewButton">Swap View</button></h2>
     <div class="chart">
-      <div class="box" id="tableView">
-        <table id="dataTable">
-          <tr>
-            <th>Header 1</th>
-            <th>Header 2</th>
-            <th>Header 3</th>
-            <th>Header 4</th>
-            <th>Header 5</th>
-          </tr>
-          <tr>
-            <td>Data 1</td>
-            <td>Data 2</td>
-            <td>Data 3</td>
-            <td>Data 4</td>
-            <td>Data 5</td>
-          </tr>
-          <tr>
-            <td>Data 6</td>
-            <td>Data 7</td>
-            <td>Data 8</td>
-            <td>Data 9</td>
-            <td>Data 10</td>
-          </tr>
-          <tr>
-            <td>Data 11</td>
-            <td>Data 12</td>
-            <td>Data 13</td>
-            <td>Data 14</td>
-            <td>Data 15</td>
-          </tr>
-          <tr>
-            <td>Data 16</td>
-            <td>Data 17</td>
-            <td>Data 18</td>
-            <td>Data 19</td>
-            <td>Data 20</td>
-          </tr>
-          <tr>
-            <td>Data 21</td>
-            <td>Data 22</td>
-            <td>Data 23</td>
-            <td>Data 24</td>
-            <td>Data 25</td>
-          </tr>
-        </table>
-      </div>
-      <div class="box" id="otherView" style="display: none;">
-        OTHER VIEW PLACEHOLDER
+      <div class="box">
+        <canvas id="chartCanvas" width="400" height="400"></canvas>
       </div>
     </div>
   </section>
@@ -81,6 +36,7 @@
 <footer>
   <p>© 2024 Data Visualization Website. All rights reserved.</p>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
