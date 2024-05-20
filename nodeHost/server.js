@@ -4,12 +4,10 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the directory where your HTML files are located
-app.use(express.static(__dirname)); // Update if your files are in a subdirectory
+app.use(express.static(path.join(__dirname, '../'))); 
 
-// Fallback to dashboard.html for Single Page Applications
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dashboard.html')); // Update to point to dashboard.html
+    res.sendFile(path.join(__dirname, '../index.html')); 
 });
 
 app.listen(PORT, () => {
