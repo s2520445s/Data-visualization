@@ -81,6 +81,7 @@ function initializeChart(chartType) {
     });
 }
 
+// Tooltips for film descriptions
 const filmDescriptions = {
     'Blood & Water': 'A local teen uncovers her family\'s secret past and navigates life in South African high school.',
     'Midnight Mass': 'An isolated island community experiences miraculous events and frightening omens after the arrival of a charismatic, mysterious young priest.',
@@ -88,7 +89,6 @@ const filmDescriptions = {
     'Tango With Me': 'A couple must navigate the complexities of marriage and forgiveness after a traumatic event.',
     'Last Chance U': 'Elite athletes in tough life circumstances seek to find their redemption on a junior college football team.'
 };
-
 
 function createTooltips() {
     const filmTitles = document.querySelectorAll('.tooltip');
@@ -100,36 +100,19 @@ function createTooltips() {
             tooltipText.textContent = filmDescriptions[filmName];
             title.appendChild(tooltipText);
 
-            
             title.addEventListener('click', function() {
-                
                 document.querySelectorAll('.tooltip .tooltiptext.click-visible').forEach(tooltip => {
                     if (tooltip !== tooltipText) {
                         tooltip.classList.remove('click-visible');
                     }
                 });
-
-                
                 tooltipText.classList.toggle('click-visible');
             });
         }
     });
 }
 
-
-window.addEventListener('load', function() {
-    createTooltips();
-});
-
-
-
-document.getElementById('swapViewButton').addEventListener('click', function() {
-    currentChartIndex = (currentChartIndex + 1) % chartTypes.length;
-    initializeChart(chartTypes[currentChartIndex]);
-    saveSettings(currentChartIndex);
-});
-
-
+// Load settings and initialize chart on page load
 window.addEventListener('load', function() {
     currentChartIndex = parseInt(loadSettings(), 10);
 
@@ -138,4 +121,12 @@ window.addEventListener('load', function() {
     }
 
     initializeChart(chartTypes[currentChartIndex]);
+    createTooltips();  // Initialize tooltips after the page loads
+});
+
+// Event listener for swapping chart view
+document.getElementById('swapViewButton').addEventListener('click', function() {
+    currentChartIndex = (currentChartIndex + 1) % chartTypes.length;
+    initializeChart(chartTypes[currentChartIndex]);
+    saveSettings(currentChartIndex);
 });
