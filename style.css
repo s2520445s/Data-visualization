@@ -124,6 +124,8 @@ main {
     background-color: #666;
 }
 
+
+
 footer {
     text-align: center;
     padding: 10px 0;
@@ -280,3 +282,46 @@ footer {
 footer p {
     margin: 0;
 }
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; 
+    left: 50%;
+    margin-left: -100px; 
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+  
+  
+  .tooltip .tooltiptext.click-visible {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  
+  .box a.clickable {
+      color: black;
+      text-decoration: none;
+      transition: color 0.3s ease;
+  }
+  
+  .box a.clickable:hover {
+      color: #f73d1f;
+      text-decoration: underline;
+  }
+  
