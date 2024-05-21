@@ -1,58 +1,74 @@
-const chartTypes = ['bar', 'line', 'pie', 'doughnut', 'radar'];
-let currentChartIndex = 0;
-let chartInstance;
+const chartTypes = ['line', 'bar'];
+let currentReleaseYearChartIndex = 0;
+let currentGenreChartIndex = 0;
+let currentAgeRangeChartIndex = 0;
+let releaseYearChart, genreChart, ageRangeChart;
+let allData = [];
 
-// Function to save settings to Local Storage
-function saveSettings(viewIndex) {
-    localStorage.setItem('dataVizView', viewIndex);
-}
-
-// Function to load settings from Local Storage
-function loadSettings() {
-    return localStorage.getItem('dataVizView') || 0;
-}
-
-// Function to initialize the chart
-function initializeChart(chartType) {
-    console.log(`Initializing chart of type: ${chartType}`);  // Debug logging
-    const ctx = document.getElementById('chartCanvas').getContext('2d');
-
-    // Destroy the previous chart instance if it exists
-    if (chartInstance) {
-        chartInstance.destroy();
+async function fetchData() {
+    try {
+        const response = await fetch('https://datavizbackendfromphp.onrender.com/data'); // Update this to your backend URL
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const rawData = await response.json();
+        allData = rawData;
+        updateAllCharts();
+    } catch (error) {
+        console.error('Error fetching data:', error.message);
     }
+}
 
-    if (!chartType || !chartTypes.includes(chartType)) {
-        console.error(`Invalid chart type: ${chartType}`);  // Debug logging for invalid chart type
+function parseCsvData(rawData, aspect) {
+    const validRatings = ["G", "PG", "PG-13", "R", "NC-17", "TV-Y", "TV-Y7", "TV-G", "TV-PG", "TV-14", "TV-MA", "NR"];
+    switch (aspect) {
+        case 'release_year':
+            return rawData.reduce((acc, record) => {
+                acc[record.release_year] = (acc[record.release_year] || 0) + 1;
+                return acc;
+            }, {});
+        case 'rating':
+            return rawData.reduce((acc, record) => {
+                if (validRatings.includes(record.rating)) {
+                    acc[record.rating] = (acc[record.rating] || 0) + 1;
+                }
+                return acc;
+            }, {});
+        case 'genre':
+            return rawData.reduce((acc, record) => {
+                record.listed_in.split(',').forEach(genre => {
+                    genre = genre.trim();
+                    acc[genre] = (acc[genre] || 0) + 1;
+                });
+                return acc;
+            }, {});
+        default:
+            return {};
+    }
+}
+
+function initializeChart(chartType, data, canvasId, aspect) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+
+    if (!data || !Object.keys(data).length) {
+        console.error('Invalid data for chart initialization');
         return;
     }
 
-    // Sample data for the chart
-    const data = {
-        labels: ['Header 1', 'Header 2', 'Header 3', 'Header 4', 'Header 5'],
-        datasets: [{
-            label: 'Dataset 1',
-            data: [12, 19, 3, 5, 2],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)'
-            ],
-            borderWidth: 1
-        }]
+    if (aspect === 'release_year' && releaseYearChart) {
+        releaseYearChart.destroy();
+    } else if (aspect === 'genre' && genreChart) {
+        genreChart.destroy();
+    } else if (aspect === 'rating' && ageRangeChart) {
+        ageRangeChart.destroy();
+    }
+
+    const colors = {
+        backgroundColor: 'rgba(229, 9, 20, 0.2)', // Light, transparent Netflix red
+        borderColor: 'rgba(229, 9, 20, 0.8)' // Darker, semi-transparent Netflix red for the border
     };
 
-    // Options for the chart
-    const options = {
+    const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -66,76 +82,69 @@ function initializeChart(chartType) {
             }
         },
         scales: {
+            x: {
+                ticks: {
+                    autoSkip: chartType === 'line' && aspect === 'release_year',
+                    maxTicksLimit: chartType === 'line' && aspect === 'release_year' ? Math.floor(Object.keys(data).length / 2) : undefined
+                }
+            },
             y: {
-                beginAtZero: true,
-                display: chartType !== 'pie' && chartType !== 'doughnut' && chartType !== 'radar'
+                beginAtZero: true
             }
         }
     };
 
-    // Initialize the new chart
-    chartInstance = new Chart(ctx, {
+    const newChart = new Chart(ctx, {
         type: chartType,
-        data: data,
-        options: options
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                label: 'Count',
+                data: Object.values(data),
+                backgroundColor: colors.backgroundColor,
+                borderColor: colors.borderColor,
+                borderWidth: 1
+            }]
+        },
+        options: chartOptions
     });
-}
 
-const filmDescriptions = {
-    'Blood & Water': 'A local teen uncovers her family\'s secret past and navigates life in South African high school.',
-    'Midnight Mass': 'An isolated island community experiences miraculous events and frightening omens after the arrival of a charismatic, mysterious young priest.',
-    'Avvai Shanmughi': 'A hilarious drama where a man disguises himself as a nanny to be closer to his daughter.',
-    'Tango With Me': 'A couple must navigate the complexities of marriage and forgiveness after a traumatic event.',
-    'Last Chance U': 'Elite athletes in tough life circumstances seek to find their redemption on a junior college football team.'
-};
-
-
-function createTooltips() {
-    const filmTitles = document.querySelectorAll('.tooltip');
-    filmTitles.forEach(title => {
-        const filmName = title.textContent;
-        if (filmDescriptions[filmName]) {
-            const tooltipText = document.createElement('span');
-            tooltipText.className = 'tooltiptext';
-            tooltipText.textContent = filmDescriptions[filmName];
-            title.appendChild(tooltipText);
-
-            
-            title.addEventListener('click', function() {
-                
-                document.querySelectorAll('.tooltip .tooltiptext.click-visible').forEach(tooltip => {
-                    if (tooltip !== tooltipText) {
-                        tooltip.classList.remove('click-visible');
-                    }
-                });
-
-                
-                tooltipText.classList.toggle('click-visible');
-            });
-        }
-    });
-}
-
-
-window.addEventListener('load', function() {
-    createTooltips();
-});
-
-
-
-document.getElementById('swapViewButton').addEventListener('click', function() {
-    currentChartIndex = (currentChartIndex + 1) % chartTypes.length;
-    initializeChart(chartTypes[currentChartIndex]);
-    saveSettings(currentChartIndex);
-});
-
-
-window.addEventListener('load', function() {
-    currentChartIndex = parseInt(loadSettings(), 10);
-
-    if (isNaN(currentChartIndex) || currentChartIndex < 0 || currentChartIndex >= chartTypes.length) {
-        currentChartIndex = 0;
+    if (aspect === 'release_year') {
+        releaseYearChart = newChart;
+    } else if (aspect === 'genre') {
+        genreChart = newChart;
+    } else if (aspect === 'rating') {
+        ageRangeChart = newChart;
     }
+}
 
-    initializeChart(chartTypes[currentChartIndex]);
+function updateChart(aspect, canvasId, currentChartIndex) {
+    const data = parseCsvData(allData, aspect);
+    const chartType = chartTypes[currentChartIndex];
+    initializeChart(chartType, data, canvasId, aspect);
+}
+
+function updateAllCharts() {
+    updateChart('release_year', 'chartCanvasReleaseYear', currentReleaseYearChartIndex);
+    updateChart('genre', 'chartCanvasGenre', currentGenreChartIndex);
+    updateChart('rating', 'chartCanvasAgeRange', currentAgeRangeChartIndex);
+}
+
+document.getElementById('swapViewButtonReleaseYear').addEventListener('click', function() {
+    currentReleaseYearChartIndex = (currentReleaseYearChartIndex + 1) % chartTypes.length;
+    updateChart('release_year', 'chartCanvasReleaseYear', currentReleaseYearChartIndex);
 });
+
+document.getElementById('swapViewButtonGenre').addEventListener('click', function() {
+    currentGenreChartIndex = (currentGenreChartIndex + 1) % chartTypes.length;
+    updateChart('genre', 'chartCanvasGenre', currentGenreChartIndex);
+});
+
+document.getElementById('swapViewButtonAgeRange').addEventListener('click', function() {
+    currentAgeRangeChartIndex = (currentAgeRangeChartIndex + 1) % chartTypes.length;
+    updateChart('rating', 'chartCanvasAgeRange', currentAgeRangeChartIndex);
+});
+
+window.addEventListener('load', fetchData);
+
+
