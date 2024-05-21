@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netflix Data Visualization</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="login.html">Login</a>
+    <a href="profile.html">Register/Profile</a>
+    <a href="about.html">About</a>
+  </nav>
+  <h1 class="curved-title">Data Visualization Dashboard</h1>
+  <p>Welcome to our interactive data visualization platform.</p>
+</header>
+<main>
+  <section id="releaseYearSection">
+    <h2>Release Year <button id="swapViewButtonReleaseYear">Swap View</button></h2>
+    <div class="chart">
+      <div class="box">
+        <canvas id="chartCanvasReleaseYear" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </section>
+  <section id="genreSection">
+    <h2>Genre <button id="swapViewButtonGenre">Swap View</button></h2>
+    <div class="chart">
+      <div class="box">
+        <canvas id="chartCanvasGenre" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </section>
+  <section id="ageRangeSection">
+    <h2>Age Range <button id="swapViewButtonAgeRange">Swap View</button></h2>
+    <div class="chart">
+      <div class="box">
+        <canvas id="chartCanvasAgeRange" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <p>© 2024 Data Visualization Website. All rights reserved.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
